@@ -3,19 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>iyikisen </title>
+  <title>Ayşegül 3D Heart</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       width: 100vw; 
       height: 100vh; 
-      background: #0d0104; 
+      background: radial-gradient(circle, #3d1422 0%, #17080f 100%); 
       overflow: hidden; 
       display: flex; 
       justify-content: center; 
       align-items: center; 
       font-family: 'Arial', sans-serif; 
       touch-action: none; 
+      transition: background 0.8s ease;
     }
     #canvas-container { width: 100%; height: 100%; }
     
@@ -24,17 +25,17 @@
       bottom: 25px;
       left: 50%;
       transform: translateX(-50%);
-      color: #ffffff;
+      color: rgba(255, 240, 245, 0.9);
       font-size: 14px;
       letter-spacing: 1.5px;
       text-align: center;
-      background: rgba(255, 0, 50, 0.2);
+      background: rgba(255, 77, 109, 0.12);
       padding: 8px 18px;
       border-radius: 20px;
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 100, 120, 0.4);
+      border: 1px solid rgba(255, 150, 170, 0.25);
       pointer-events: none;
-      box-shadow: 0 4px 20px rgba(255, 0, 50, 0.4);
+      box-shadow: 0 4px 20px rgba(100, 20, 40, 0.3);
       z-index: 10;
     }
   </style>
@@ -85,17 +86,17 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Yıldızlar
+    // Soft Arka Plan Yıldızları
     const starGeo = new THREE.BufferGeometry();
-    const starCount = 500;
+    const starCount = 400;
     const posArr = new Float32Array(starCount * 3);
     for(let i=0; i<starCount*3; i++) posArr[i] = (Math.random() - 0.5) * 60;
     starGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
-    const starMat = new THREE.PointsMaterial({ size: 0.15, color: 0xff88aa, transparent: true, opacity: 0.6 });
+    const starMat = new THREE.PointsMaterial({ size: 0.12, color: 0xffccd5, transparent: true, opacity: 0.4 });
     const stars = new THREE.Points(starGeo, starMat);
     scene.add(stars);
 
-    // Yazı Üretici (Parlak Beyaz / Kırmızı Gölgeli)
+    // Yazı Üretici
     function createTextTexture(text, colorStr, glowColor, fontSize = 65) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -107,7 +108,7 @@
       ctx.textBaseline = 'middle';
       if (glowColor) {
         ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 45;
+        ctx.shadowBlur = 35;
       }
       ctx.fillStyle = colorStr;
       ctx.fillText(text, canvas.width / 2, canvas.height / 2);
@@ -117,8 +118,8 @@
       return texture;
     }
 
-    const texAysegul = createTextTexture('Ayşegül', '#ffffff', '#ff0044', 65);
-    const texLove = createTextTexture('I love you', '#ffffff', '#ff1a53', 65);
+    const texAysegul = createTextTexture('Ayşegül', '#ffffff', '#ff1744', 65);
+    const texLove = createTextTexture('I love you', '#ffffff', '#ff4081', 65);
 
     const heartGroup = new THREE.Group();
     scene.add(heartGroup);
@@ -136,8 +137,8 @@
       const mat = new THREE.MeshBasicMaterial({ 
         map: Math.random() > 0.5 ? texAysegul : texLove, 
         transparent: true, 
-        opacity: 0.95, 
-        color: new THREE.Color(0xff2255),
+        opacity: 0.9, 
+        color: new THREE.Color(0xff2a55),
         side: THREE.FrontSide 
       });
       materials.push(mat);
@@ -160,8 +161,8 @@
       const mat = new THREE.MeshBasicMaterial({ 
         map: Math.random() > 0.5 ? texAysegul : texLove, 
         transparent: true, 
-        opacity: 0.7, 
-        color: new THREE.Color(0xe60039),
+        opacity: 0.65, 
+        color: new THREE.Color(0xd90429),
         side: THREE.FrontSide 
       });
       materials.push(mat);
@@ -172,26 +173,48 @@
       heartGroup.add(mesh);
     }
 
-    // Kelebekler
+    // --- 3. DAHA ZARİF VE GERÇEKÇİ KELEBEKLER ---
     function createButterflyTexture() {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      canvas.width = 128; canvas.height = 128;
+      canvas.width = 256; canvas.height = 256;
 
-      ctx.fillStyle = '#ff3366';
-      ctx.shadowColor = '#ff0044';
-      ctx.shadowBlur = 20;
+      // Soft Parlama
+      ctx.shadowColor = '#ff85a1';
+      ctx.shadowBlur = 12;
 
+      // Üst Kanatlar (Daha kavisli ve zarif)
+      ctx.fillStyle = '#ffb3c6';
       ctx.beginPath();
-      ctx.ellipse(45, 45, 25, 35, Math.PI / 4, 0, Math.PI * 2);
-      ctx.ellipse(83, 45, 25, 35, -Math.PI / 4, 0, Math.PI * 2);
-      ctx.ellipse(48, 80, 18, 25, Math.PI / 6, 0, Math.PI * 2);
-      ctx.ellipse(80, 80, 18, 25, -Math.PI / 6, 0, Math.PI * 2);
+      ctx.moveTo(128, 128);
+      ctx.bezierCurveTo(70, 70, 20, 90, 40, 40);
+      ctx.bezierCurveTo(60, 20, 110, 60, 128, 128);
       ctx.fill();
 
+      ctx.beginPath();
+      ctx.moveTo(128, 128);
+      ctx.bezierCurveTo(186, 70, 236, 90, 216, 40);
+      ctx.bezierCurveTo(196, 20, 146, 60, 128, 128);
+      ctx.fill();
+
+      // Alt Kanatlar
+      ctx.fillStyle = '#ffccd5';
+      ctx.beginPath();
+      ctx.moveTo(128, 128);
+      ctx.bezierCurveTo(60, 140, 30, 180, 60, 200);
+      ctx.bezierCurveTo(90, 210, 110, 160, 128, 128);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(128, 128);
+      ctx.bezierCurveTo(196, 140, 226, 180, 196, 200);
+      ctx.bezierCurveTo(166, 210, 146, 160, 128, 128);
+      ctx.fill();
+
+      // İnce Zarif Gövde
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.ellipse(64, 64, 4, 22, 0, 0, Math.PI * 2);
+      ctx.ellipse(128, 128, 3, 35, 0, 0, Math.PI * 2);
       ctx.fill();
 
       return new THREE.CanvasTexture(canvas);
@@ -199,22 +222,36 @@
 
     const butterflyTex = createButterflyTexture();
     const butterflies = [];
-    for (let i = 0; i < 20; i++) {
-      const mat = new THREE.MeshBasicMaterial({ map: butterflyTex, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), mat);
-      mesh.position.set((Math.random() - 0.5) * 35, (Math.random() - 0.5) * 35, (Math.random() - 0.5) * 20);
+    const butterflyCount = 18;
+
+    for (let i = 0; i < butterflyCount; i++) {
+      const mat = new THREE.MeshBasicMaterial({
+        map: butterflyTex,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), mat);
+      
+      mesh.position.set(
+        (Math.random() - 0.5) * 35,
+        (Math.random() - 0.5) * 35,
+        (Math.random() - 0.5) * 20
+      );
+
       scene.add(mesh);
       butterflies.push({
         mesh,
-        speedX: (Math.random() - 0.5) * 0.03,
-        speedY: Math.random() * 0.02 + 0.01,
-        speedZ: (Math.random() - 0.5) * 0.02,
-        wingSpeed: Math.random() * 0.15 + 0.1,
-        wingAngle: Math.random() * Math.PI
+        speedX: (Math.random() - 0.5) * 0.02,
+        speedY: Math.random() * 0.015 + 0.008,
+        speedZ: (Math.random() - 0.5) * 0.015,
+        wingSpeed: Math.random() * 0.12 + 0.08,
+        wingAngle: Math.random() * Math.PI,
+        floatSpeed: Math.random() * 0.02 + 0.01
       });
     }
 
-    // Dokunma / Döndürme
+    // --- 4. DOKUNMA VE SÜRÜKLEME KONTROLLERİ ---
     let isDragging = false;
     let previousPointerPosition = { x: 0, y: 0 };
     let targetScale = 1.0;
@@ -224,8 +261,10 @@
       previousPointerPosition = { x: e.clientX, y: e.clientY };
       targetScale = 1.15;
     });
+
     window.addEventListener('pointerup', () => { isDragging = false; targetScale = 1.0; });
     window.addEventListener('pointercancel', () => { isDragging = false; targetScale = 1.0; });
+    
     window.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
       heartGroup.rotation.y += (e.clientX - previousPointerPosition.x) * 0.008;
@@ -238,33 +277,48 @@
       camera.position.z = Math.max(10, Math.min(35, camera.position.z));
     }, { passive: true });
 
+    // --- 5. ANİMASYON VE RENK GEÇİŞLERİ ---
     let colorTime = 0;
+
     function animate() {
       requestAnimationFrame(animate);
-      if (!isDragging) heartGroup.rotation.y += 0.004;
+      
+      if (!isDragging) {
+        heartGroup.rotation.y += 0.004;
+      }
 
       heartGroup.scale.x += (targetScale - heartGroup.scale.x) * 0.1;
       heartGroup.scale.y += (targetScale - heartGroup.scale.y) * 0.1;
       heartGroup.scale.z += (targetScale - heartGroup.scale.z) * 0.1;
 
-      colorTime += 0.006;
-      const r = 0.9 + Math.sin(colorTime) * 0.1;
-      const g = 0.1 + Math.sin(colorTime + 1) * 0.1;
-      const b = 0.3 + Math.cos(colorTime * 0.8) * 0.2;
+      // Akıcı Renk Geçişleri
+      colorTime += 0.005;
+      const r = 0.88 + Math.sin(colorTime) * 0.12;
+      const g = 0.15 + Math.sin(colorTime + 1) * 0.1;
+      const b = 0.35 + Math.cos(colorTime * 0.8) * 0.15;
 
       for (let i = 0; i < materials.length; i++) {
         materials[i].color.setRGB(r, g, b);
       }
 
-      butterflies.forEach(b => {
-        b.mesh.position.x += b.speedX;
+      // Soft Arka Plan Ton Geçişi
+      const bgR = Math.floor(50 + Math.sin(colorTime * 0.4) * 15);
+      const bgG = Math.floor(18 + Math.sin(colorTime * 0.4) * 5);
+      const bgB = Math.floor(32 + Math.cos(colorTime * 0.4) * 10);
+      document.body.style.background = `radial-gradient(circle, rgb(${bgR}, ${bgG}, ${bgB}) 0%, rgb(18, 6, 12) 100%)`;
+
+      // Kelebeklerin Doğal Salınım ve Kanat Çırpma Hareketi
+      butterflies.forEach((b, index) => {
+        b.mesh.position.x += b.speedX + Math.sin(colorTime + index) * 0.01;
         b.mesh.position.y += b.speedY;
         b.mesh.position.z += b.speedZ;
+
         b.wingAngle += b.wingSpeed;
-        b.mesh.scale.x = Math.sin(b.wingAngle) * 0.8;
+        b.mesh.scale.x = Math.sin(b.wingAngle) * 0.9; // Daha yumuşak kanat çırpma
+
         if (b.mesh.position.y > 20) b.mesh.position.y = -20;
-        if (b.mesh.position.x > 20) b.mesh.position.x = -20;
-        if (b.mesh.position.x < -20) b.mesh.position.x = 20;
+        if (b.mesh.position.x > 22) b.mesh.position.x = -22;
+        if (b.mesh.position.x < -22) b.mesh.position.x = 22;
       });
 
       stars.rotation.y += 0.0002;
