@@ -3,40 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Ayşegül 3D Heart</title>
+  <title>iyikisen </title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       width: 100vw; 
       height: 100vh; 
-      background: radial-gradient(circle, #2b020d 0%, #050002 100%); 
+      background: #0d0104; 
       overflow: hidden; 
       display: flex; 
       justify-content: center; 
       align-items: center; 
       font-family: 'Arial', sans-serif; 
       touch-action: none; 
-      transition: background 0.5s ease;
     }
     #canvas-container { width: 100%; height: 100%; }
     
-    /* Zarif Birlikte Geçen Zaman Sayacı */
     #counter-container {
       position: absolute;
       bottom: 25px;
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(255, 230, 230, 0.9);
+      color: #ffffff;
       font-size: 14px;
       letter-spacing: 1.5px;
       text-align: center;
-      background: rgba(255, 0, 40, 0.08);
+      background: rgba(255, 0, 50, 0.2);
       padding: 8px 18px;
       border-radius: 20px;
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 100, 120, 0.2);
+      border: 1px solid rgba(255, 100, 120, 0.4);
       pointer-events: none;
-      box-shadow: 0 4px 20px rgba(150, 0, 30, 0.3);
+      box-shadow: 0 4px 20px rgba(255, 0, 50, 0.4);
       z-index: 10;
     }
   </style>
@@ -87,14 +85,199 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Arka Plan Işıltıları / Yıldız Efekti
+    // Yıldızlar
     const starGeo = new THREE.BufferGeometry();
-    const starCount = 600;
+    const starCount = 500;
     const posArr = new Float32Array(starCount * 3);
     for(let i=0; i<starCount*3; i++) posArr[i] = (Math.random() - 0.5) * 60;
     starGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
-    const starMat = new THREE.PointsMaterial({ size: 0.12, color: 0xffb3c1, transparent: true, opacity: 0.35 });
+    const starMat = new THREE.PointsMaterial({ size: 0.15, color: 0xff88aa, transparent: true, opacity: 0.6 });
     const stars = new THREE.Points(starGeo, starMat);
     scene.add(stars);
 
-    // Kırmızı Temalı Yüksek Kaliteli Yazı Üretici
+    // Yazı Üretici (Parlak Beyaz / Kırmızı Gölgeli)
+    function createTextTexture(text, colorStr, glowColor, fontSize = 65) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 1024; 
+      canvas.height = 256;
+
+      ctx.font = `Bold ${fontSize}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (glowColor) {
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 45;
+      }
+      ctx.fillStyle = colorStr;
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+      
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      return texture;
+    }
+
+    const texAysegul = createTextTexture('Ayşegül', '#ffffff', '#ff0044', 65);
+    const texLove = createTextTexture('I love you', '#ffffff', '#ff1a53', 65);
+
+    const heartGroup = new THREE.Group();
+    scene.add(heartGroup);
+
+    const materials = [];
+
+    // Dış Yüzey Kalp Noktaları
+    for (let i = 0; i < 2500; i++) {
+      const u = Math.PI * (2 * Math.random() - 1);
+      const v = (Math.PI / 2) * (2 * Math.random() - 1);
+      const x = 16 * Math.pow(Math.sin(u), 3) * Math.cos(v);
+      const y = (13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * Math.cos(v);
+      const z = 6 * Math.sin(v);
+      
+      const mat = new THREE.MeshBasicMaterial({ 
+        map: Math.random() > 0.5 ? texAysegul : texLove, 
+        transparent: true, 
+        opacity: 0.95, 
+        color: new THREE.Color(0xff2255),
+        side: THREE.FrontSide 
+      });
+      materials.push(mat);
+
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 0.5), mat);
+      mesh.position.set(x * 0.38, y * 0.38, z * 0.38);
+      mesh.lookAt(mesh.position.clone().multiplyScalar(2));
+      heartGroup.add(mesh);
+    }
+
+    // İç Dolgu Kalp Noktaları
+    for (let i = 0; i < 1500; i++) {
+      const u = Math.PI * (2 * Math.random() - 1);
+      const v = (Math.PI / 2) * (2 * Math.random() - 1);
+      const x = 16 * Math.pow(Math.sin(u), 3) * Math.cos(v);
+      const y = (13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * Math.cos(v);
+      const z = 6 * Math.sin(v);
+      
+      const internalScale = Math.random() * 0.85;
+      const mat = new THREE.MeshBasicMaterial({ 
+        map: Math.random() > 0.5 ? texAysegul : texLove, 
+        transparent: true, 
+        opacity: 0.7, 
+        color: new THREE.Color(0xe60039),
+        side: THREE.FrontSide 
+      });
+      materials.push(mat);
+
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), mat);
+      mesh.position.set(x * 0.38 * internalScale, y * 0.38 * internalScale, z * 0.38 * internalScale);
+      mesh.rotation.y = Math.random() * Math.PI;
+      heartGroup.add(mesh);
+    }
+
+    // Kelebekler
+    function createButterflyTexture() {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 128; canvas.height = 128;
+
+      ctx.fillStyle = '#ff3366';
+      ctx.shadowColor = '#ff0044';
+      ctx.shadowBlur = 20;
+
+      ctx.beginPath();
+      ctx.ellipse(45, 45, 25, 35, Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(83, 45, 25, 35, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(48, 80, 18, 25, Math.PI / 6, 0, Math.PI * 2);
+      ctx.ellipse(80, 80, 18, 25, -Math.PI / 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(64, 64, 4, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const butterflyTex = createButterflyTexture();
+    const butterflies = [];
+    for (let i = 0; i < 20; i++) {
+      const mat = new THREE.MeshBasicMaterial({ map: butterflyTex, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), mat);
+      mesh.position.set((Math.random() - 0.5) * 35, (Math.random() - 0.5) * 35, (Math.random() - 0.5) * 20);
+      scene.add(mesh);
+      butterflies.push({
+        mesh,
+        speedX: (Math.random() - 0.5) * 0.03,
+        speedY: Math.random() * 0.02 + 0.01,
+        speedZ: (Math.random() - 0.5) * 0.02,
+        wingSpeed: Math.random() * 0.15 + 0.1,
+        wingAngle: Math.random() * Math.PI
+      });
+    }
+
+    // Dokunma / Döndürme
+    let isDragging = false;
+    let previousPointerPosition = { x: 0, y: 0 };
+    let targetScale = 1.0;
+
+    window.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      previousPointerPosition = { x: e.clientX, y: e.clientY };
+      targetScale = 1.15;
+    });
+    window.addEventListener('pointerup', () => { isDragging = false; targetScale = 1.0; });
+    window.addEventListener('pointercancel', () => { isDragging = false; targetScale = 1.0; });
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      heartGroup.rotation.y += (e.clientX - previousPointerPosition.x) * 0.008;
+      heartGroup.rotation.x += (e.clientY - previousPointerPosition.y) * 0.005;
+      previousPointerPosition = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('wheel', (e) => {
+      camera.position.z += e.deltaY * 0.015;
+      camera.position.z = Math.max(10, Math.min(35, camera.position.z));
+    }, { passive: true });
+
+    let colorTime = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      if (!isDragging) heartGroup.rotation.y += 0.004;
+
+      heartGroup.scale.x += (targetScale - heartGroup.scale.x) * 0.1;
+      heartGroup.scale.y += (targetScale - heartGroup.scale.y) * 0.1;
+      heartGroup.scale.z += (targetScale - heartGroup.scale.z) * 0.1;
+
+      colorTime += 0.006;
+      const r = 0.9 + Math.sin(colorTime) * 0.1;
+      const g = 0.1 + Math.sin(colorTime + 1) * 0.1;
+      const b = 0.3 + Math.cos(colorTime * 0.8) * 0.2;
+
+      for (let i = 0; i < materials.length; i++) {
+        materials[i].color.setRGB(r, g, b);
+      }
+
+      butterflies.forEach(b => {
+        b.mesh.position.x += b.speedX;
+        b.mesh.position.y += b.speedY;
+        b.mesh.position.z += b.speedZ;
+        b.wingAngle += b.wingSpeed;
+        b.mesh.scale.x = Math.sin(b.wingAngle) * 0.8;
+        if (b.mesh.position.y > 20) b.mesh.position.y = -20;
+        if (b.mesh.position.x > 20) b.mesh.position.x = -20;
+        if (b.mesh.position.x < -20) b.mesh.position.x = 20;
+      });
+
+      stars.rotation.y += 0.0002;
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
